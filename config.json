@@ -1,0 +1,7 @@
+{
+    "ShortcutName": "MyShortcut",
+    "ShortcutUrl": "https://www.example.com",
+	"IconUrl": "./icon.ico",
+    "Logging": false,
+	"CommonDesktop": false
+}
