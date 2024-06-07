@@ -26,6 +26,11 @@ param (
     [switch]$CommonDesktop
 )
 
+# Manually fill these variables if using ex. Intune (Intune does not support CLI args or config files with check scripts)
+# $ManualShortcutName = "MyShortcut"
+# $ManualCommonDesktop = $false  # Set to $true for Common Desktop, $false for User Desktop
+# $ManualLogging = $false  # Set to $true to enable logging
+
 # Path to configuration file
 $configFilePath = "$PSScriptRoot\config.json"
 
@@ -37,12 +42,17 @@ if (Test-Path $configFilePath) {
     $config = Get-Content -Path $configFilePath | ConvertFrom-Json
 }
 
-# Use parameters from the command line or fall back to config file values
+# Prioritize manually set variables
+if ($ManualShortcutName) { $ShortcutName = $ManualShortcutName }
+if ($ManualCommonDesktop) { $CommonDesktop = $ManualCommonDesktop }
+if ($ManualLogging) { $Logging = $ManualLogging }
+
+# Use parameters from the command line or fall back to config file values if not manually set
 if (-not $ShortcutName) { $ShortcutName = $config.ShortcutName }
 if (-not $Logging -and $config.Logging -ne $null) { $Logging = $config.Logging }
 if (-not $CommonDesktop) { $CommonDesktop = $config.CommonDesktop }
 
-# Validate that all parameters are provided
+# Validate that the shortcut name is provided
 if (-not $ShortcutName) { Write-Error "ShortcutName is required but not provided."; exit 1 }
 
 # Determine log file path
