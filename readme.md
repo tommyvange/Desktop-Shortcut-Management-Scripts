@@ -88,6 +88,8 @@ To use the default values from the configuration file:
 ### Description
 The remove shortcut script removes a specified desktop shortcut.
 
+Just comment out the lines and populate the data. The script will then use this data instead of requiring CLI arguments or conmfig.json
+
 ### Usage
 To run the remove shortcut script, use the following command:
 
@@ -132,6 +134,19 @@ To run the check shortcut script, use the following command:
 ``` powershell
 .\check_shortcut.ps1 -ShortcutName "<ShortcutName>" [-Logging] [-CommonDesktop]
 ```
+
+#### Usage without `config.json` or Command Arguments
+If you are running this as a check script in environments such as Intune, it is best to populate the variables directly in the code. Intune does not allow passing CLI arguments or using `config.json` for check scripts, so the only way is to set the variables within the script itself.
+
+The script includes a section designed for this purpose:
+``` powershell
+# Manually fill these variables if using ex. Intune (Intune does not support CLI args or config files with check scripts)
+# $ManualShortcutName = "MyShortcut"
+# $ManualCommonDesktop = $false  # Set to $true for Common Desktop, $false for User Desktop
+# $ManualLogging = $false  # Set to $true to enable logging
+```
+
+To use this feature, simply uncomment these lines and populate the variables with your desired values. The script will prioritize these manual settings over CLI arguments and config.json, ensuring that the specified data is used during execution. This approach allows seamless integration with Intune and similar deployment tools.
 
 ### Parameters
 - `ShortcutName`: The name of the shortcut to check.
