@@ -28,11 +28,11 @@ param (
     [switch]$CommonDesktop
 )
 
-# Path to configuration file
-$configFilePath = "$PSScriptRoot\config.json"
-
 # Initialize configuration variable
 $config = $null
+
+# Path to configuration file
+$configFilePath = "$PSScriptRoot\config.json"
 
 # Check if configuration file exists and load it
 if (Test-Path $configFilePath) {
@@ -72,15 +72,26 @@ try {
 
     # Handle the icon URL
     if ($IconUrl) {
+        # Determine persistent icon path in ProgramData
+        $iconFolderPath = [System.IO.Path]::Combine($env:ProgramData, "DesktopIcons")
+        if (-not (Test-Path $iconFolderPath)) {
+            New-Item -ItemType Directory -Path $iconFolderPath | Out-Null
+        }
+        $iconPath = [System.IO.Path]::Combine($iconFolderPath, "$($ShortcutName).ico")
+
         if ($IconUrl -match '^https?://') {
             # Download the icon from the web
-            $iconPath = "$env:TEMP\$($ShortcutName).ico"
-            Invoke-WebRequest -Uri $IconUrl -OutFile $iconPath
+            try {
+                Invoke-WebRequest -Uri $IconUrl -OutFile $iconPath -UseBasicParsing
+            } catch {
+                Write-Error "Failed to download icon from $IconUrl"
+                exit 1
+            }
         } else {
             # Assume local path and resolve with $PSScriptRoot
             $localIconPath = [System.IO.Path]::Combine($PSScriptRoot, $IconUrl)
             if (Test-Path (Resolve-Path $localIconPath)) {
-                $iconPath = (Resolve-Path $localIconPath).Path
+                Copy-Item -Path (Resolve-Path $localIconPath) -Destination $iconPath -Force
             } else {
                 Write-Error "Icon file does not exist: $localIconPath"
                 exit 1
