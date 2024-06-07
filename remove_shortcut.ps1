@@ -64,11 +64,21 @@ try {
     if (Test-Path $desktopPath) {
         Remove-Item $desktopPath -Force
         Write-Output "Shortcut '$ShortcutName' removed successfully from the desktop."
-        exit 0
     } else {
         Write-Output "Shortcut '$ShortcutName' does not exist on the desktop."
-        exit 0
     }
+
+    # Remove the icon
+    $iconFolderPath = [System.IO.Path]::Combine($env:ProgramData, "DesktopIcons")
+    $iconPath = [System.IO.Path]::Combine($iconFolderPath, "$($ShortcutName).ico")
+    if (Test-Path $iconPath) {
+        Remove-Item $iconPath -Force
+        Write-Output "Icon '$($ShortcutName).ico' removed successfully from $iconFolderPath."
+    } else {
+        Write-Output "Icon '$($ShortcutName).ico' does not exist in $iconFolderPath."
+    }
+    
+    exit 0
 } catch {
     Write-Output "Error: $_"
     exit 1
