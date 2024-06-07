@@ -1,3 +1,4 @@
+
 # Desktop Shortcut Management Scripts
 
 These scripts are designed to add, remove, and check desktop shortcuts on Windows machines for all users. They can read parameters from the command line, a configuration file (config.json), or use default values. If any required parameter is missing and cannot be resolved, the scripts will fail with an appropriate error message.
@@ -80,8 +81,11 @@ To use the default values from the configuration file:
 1.  Check if the shortcut name and URL are provided.
 2.  Start transcript logging if enabled.
 3.  Create the shortcut on the specified desktop (user's or common).
-4.  If an icon URL is provided, download the icon if it's a web URL or resolve it if it's a local path.
-5.  Apply the icon to the shortcut if available.
+4.  If an icon URL is provided:
+    -   Download the icon if it's a web URL or resolve it if it's a local path.
+    -   Copy the icon to a persistent location (`ProgramData\DesktopIcons`).
+    -   Apply the icon to the shortcut if available.
+5.  Save the shortcut.
 
 ## Remove Shortcut Script
 
@@ -118,10 +122,12 @@ To use the default values from the configuration file:
 .\remove_shortcut.ps1
 ```
 
+
 ### Script Workflow
 1.  Check if the shortcut name is provided.
 2.  Start transcript logging if enabled.
 3.  Remove the shortcut from the specified desktop (user's or common) if it exists.
+4.  Remove the associated icon from the persistent location (`ProgramData\DesktopIcons`) if it exists.
 
 ## Check Shortcut Script
 
@@ -221,6 +227,25 @@ Or by setting the `Logging` property in the configuration file:
 	"CommonDesktop": false
 }
 ```
+
+## Icon Management
+
+### Description
+The scripts manage desktop shortcut icons by downloading and storing them in a persistent location, ensuring they are available even after system reboots or user profile changes.
+
+### How It Works
+When an icon URL is provided, the script downloads the icon and saves it to a persistent directory within `ProgramData\DesktopIcons`. This ensures the icon remains available and is not affected by temporary file cleanups.
+
+### Persistent Icon Path
+Icons are stored in the following directory:
+
+-   `C:\ProgramData\DesktopIcons`
+
+### Handling Icons
+
+-   **Adding Icons**: When adding a shortcut, if an icon URL is provided, the script downloads the icon and stores it in the `ProgramData\DesktopIcons` directory. This icon is then assigned to the shortcut.
+-   **Removing Icons**: When removing a shortcut, the script also deletes the associated icon from the `ProgramData\DesktopIcons` directory if it exists.
+
 ## Error Handling
 
 All scripts include error handling to provide clear messages when parameters are missing or actions fail. If any required parameter is missing and cannot be resolved, the scripts will fail with an appropriate error message.
@@ -258,4 +283,3 @@ Full license can be read [here](LICENSE) or at [gnu.org](https://www.gnu.org/lic
 	
 4.  **Marking Modifications:**
     -   Clearly mark modified versions to avoid attributing problems to previous authors.
-
