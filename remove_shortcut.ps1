@@ -42,7 +42,7 @@ if (-not $ShortcutName) { $ShortcutName = $config.ShortcutName }
 if (-not $Logging -and $config.Logging -ne $null) { $Logging = $config.Logging }
 if (-not $CommonDesktop) { $CommonDesktop = $config.CommonDesktop }
 
-# Validate that all parameters are provided
+# Validate that the shortcut name is provided
 if (-not $ShortcutName) { Write-Error "ShortcutName is required but not provided."; exit 1 }
 
 # Determine log file path
@@ -56,8 +56,10 @@ if ($Logging) {
 try {
     if ($CommonDesktop) {
         $desktopPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath("CommonDesktopDirectory"), "$ShortcutName.lnk")
+        $iconFolderPath = [System.IO.Path]::Combine($env:PUBLIC, "DesktopIcons")
     } else {
         $desktopPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath("Desktop"), "$ShortcutName.lnk")
+        $iconFolderPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath("UserProfile"), "DesktopIcons")
     }
 
     # Remove the shortcut
@@ -69,7 +71,6 @@ try {
     }
 
     # Remove the icon
-    $iconFolderPath = [System.IO.Path]::Combine($env:ProgramData, "DesktopIcons")
     $iconPath = [System.IO.Path]::Combine($iconFolderPath, "$($ShortcutName).ico")
     if (Test-Path $iconPath) {
         Remove-Item $iconPath -Force

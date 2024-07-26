@@ -61,10 +61,20 @@ if ($Logging) {
 try {
     if ($CommonDesktop) {
         $desktopPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath("CommonDesktopDirectory"), "$ShortcutName.lnk")
+        $iconFolderPath = [System.IO.Path]::Combine($env:PUBLIC, "DesktopIcons")
     } else {
         $desktopPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath("Desktop"), "$ShortcutName.lnk")
+        $iconFolderPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath("UserProfile"), "DesktopIcons")
     }
     
+    # Ensure the icon directory exists
+    if (-not (Test-Path $iconFolderPath)) {
+        New-Item -ItemType Directory -Path $iconFolderPath -Force | Out-Null
+        Write-Output "Created icon folder at $iconFolderPath"
+    }
+
+    $iconPath = [System.IO.Path]::Combine($iconFolderPath, "$($ShortcutName).ico")
+
     # Create the shortcut
     $WScriptShell = New-Object -ComObject WScript.Shell
     $shortcut = $WScriptShell.CreateShortcut($desktopPath)
@@ -72,13 +82,6 @@ try {
 
     # Handle the icon URL
     if ($IconUrl) {
-        # Determine persistent icon path in ProgramData
-        $iconFolderPath = [System.IO.Path]::Combine($env:ProgramData, "DesktopIcons")
-        if (-not (Test-Path $iconFolderPath)) {
-            New-Item -ItemType Directory -Path $iconFolderPath | Out-Null
-        }
-        $iconPath = [System.IO.Path]::Combine($iconFolderPath, "$($ShortcutName).ico")
-
         if ($IconUrl -match '^https?://') {
             # Download the icon from the web
             try {
